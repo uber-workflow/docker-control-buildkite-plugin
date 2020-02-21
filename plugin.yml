@@ -1,0 +1,27 @@
+name: Docker Control
+description: Skips git checkout, extract source code from docker build image, and run command
+author: Web Platform Infrastructure
+requirements:
+  - docker
+  - docker-compose
+configuration:
+  properties:
+    compose-file:
+      type: string
+    image:
+      type: string
+    package:
+      type: string
+    service:
+      type: string
+    build:
+      type: string
+    verbose:
+      type: boolean
+    logs:
+      type: boolean
+  required:
+    - image
+    - package
+    - service
+    - compose-file

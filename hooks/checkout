@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -ex
+
+echo "[Docker Control Plugin] - Skipping git checkout"
+
+git clean -ffxdq || true

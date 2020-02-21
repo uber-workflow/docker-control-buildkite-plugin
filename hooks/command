@@ -1,0 +1,51 @@
+#!/bin/bash
+
+set -ex
+
+SCRIPT=$BUILDKITE_COMMAND
+IMAGE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_IMAGE
+COMPOSE_FILE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_COMPOSE_FILE
+SERVICE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_SERVICE
+SHOULD_BUILD=$BUILDKITE_PLUGIN_DOCKER_CONTROL_BUILD
+export PACKAGE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_PACKAGE
+
+VERBOSE=""
+if [ "$BUILDKITE_PLUGIN_DOCKER_CONTROL_VERBOSE" == "true" ]; then
+  VERBOSE="--verbose"
+fi
+
+echo "--- Running ${CMD} for ${PACKAGE} in ${IMAGE}"
+
+mkdir -p web-code-source && chmod a+w web-code-source
+
+# pull out ci code and $PACKAGE code from the docker build image, and store in local /web-code-source folder
+docker run \
+  -v ${PWD}/web-code-source:/web-code-source \
+  -i \
+  --rm \
+  -u 0 \
+  $IMAGE bash <<CMD
+rm -rf /web-code-source/*
+cp -rf /web-code/ci /web-code-source
+mkdir -p /web-code-source/$(dirname $PACKAGE)
+mkdir -p /web-code-source/projects
+cp -rf /web-code/projects/monorepo-ci /web-code-source/projects
+cp -rf /web-code/$PACKAGE /web-code-source/$PACKAGE
+echo Changing owner of /web-code-source from \$(id -u):\$(id -g) to $(id -u):$(id -g)
+chown -R $(id -u):$(id -g) /web-code-source
+echo "chown DONE"
+CMD
+
+# copy contents of web-code-source to the working directory
+cp -a web-code-source/* .
+
+if [ -n "$SHOULD_BUILD" ]; then
+  IMAGE=$IMAGE docker-compose $VERBOSE -f $COMPOSE_FILE build $SERVICE
+fi
+
+if [ -z $SCRIPT ]
+then
+  IMAGE=$IMAGE docker-compose $VERBOSE -f $COMPOSE_FILE run $SERVICE
+else
+  IMAGE=$IMAGE docker-compose $VERBOSE -f $COMPOSE_FILE run $SERVICE bash $SCRIPT
+fi
