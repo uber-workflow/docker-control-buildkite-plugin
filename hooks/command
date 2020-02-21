@@ -2,6 +2,8 @@
 
 set -ex
 
+echo "~~~ :docker: docker-control setup" >&2
+
 SCRIPT=$BUILDKITE_COMMAND
 IMAGE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_IMAGE
 COMPOSE_FILE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_COMPOSE_FILE
@@ -45,7 +47,9 @@ fi
 
 if [ -z $SCRIPT ]
 then
+  echo "+++ :docker: docker-control run" >&2
   IMAGE=$IMAGE docker-compose $VERBOSE -f $COMPOSE_FILE run $SERVICE
 else
+  echo "+++ :docker: docker-control run" >&2
   IMAGE=$IMAGE docker-compose $VERBOSE -f $COMPOSE_FILE run $SERVICE bash $SCRIPT
 fi

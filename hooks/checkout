@@ -2,6 +2,5 @@
 
 set -ex
 
-echo "[Docker Control Plugin] - Skipping git checkout"
-
+echo "~~~ :docker: docker-control checkout override" >&2
 git clean -ffxdq || true
