@@ -33,6 +33,7 @@ mkdir -p /web-code-source/$(dirname $PACKAGE)
 mkdir -p /web-code-source/projects
 cp -rf /web-code/projects/monorepo-ci /web-code-source/projects
 cp -rf /web-code/$PACKAGE /web-code-source/$PACKAGE
+cp -rf /web-code/artifacts /web-code-source/artifacts
 echo Changing owner of /web-code-source from \$(id -u):\$(id -g) to $(id -u):$(id -g)
 chown -R $(id -u):$(id -g) /web-code-source
 echo "chown DONE"
