@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ueo pipefail
+set -eo pipefail
 
 echo "~~~ :docker: docker-control checkout override" >&2
 git clean -ffxdq || true

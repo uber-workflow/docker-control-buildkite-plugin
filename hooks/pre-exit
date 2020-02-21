@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ueo pipefail
+set -eo pipefail
 
 COMPOSE_FILE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_COMPOSE_FILE
 
