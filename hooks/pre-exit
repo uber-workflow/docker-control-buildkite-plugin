@@ -14,4 +14,5 @@ fi
 echo "~~~ :docker: docker-control cleanup" >&2
 docker-compose -f $COMPOSE_FILE kill || true
 docker-compose -f $COMPOSE_FILE down || true
+echo "Removing image ${IMAGE}"
 docker image rm "$IMAGE" || true
