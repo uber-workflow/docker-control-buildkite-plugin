@@ -49,8 +49,8 @@ fi
 if [ -z $SCRIPT ]
 then
   echo "+++ :docker: docker-control run" >&2
-  IMAGE=$IMAGE docker-compose $VERBOSE -f $COMPOSE_FILE run --rm $SERVICE
+  IMAGE=$IMAGE docker-compose $VERBOSE -f $COMPOSE_FILE run $SERVICE
 else
   echo "+++ :docker: docker-control run" >&2
-  IMAGE=$IMAGE docker-compose $VERBOSE -f $COMPOSE_FILE run --rm $SERVICE bash $SCRIPT
+  IMAGE=$IMAGE docker-compose $VERBOSE -f $COMPOSE_FILE run $SERVICE bash $SCRIPT
 fi
