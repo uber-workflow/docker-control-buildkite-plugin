@@ -7,7 +7,8 @@ IMAGE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_IMAGE
 
 if [ "$BUILDKITE_PLUGIN_DOCKER_CONTROL_LOGS" == "true" ]; then
 echo "~~~ :docker: docker-control service logs" >&2
-  docker-compose -f $COMPOSE_FILE logs --tail="all" | buildkite-agent artifact upload
+  docker-compose -f $COMPOSE_FILE logs --tail="all" > docker-compose-logs.txt
+  buildkite-agent artifact upload docker-compose-logs.txt
 fi
 
 # Try to spin down services
