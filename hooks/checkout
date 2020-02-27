@@ -3,4 +3,6 @@
 set -eo pipefail
 
 echo "~~~ :docker: docker-control checkout override" >&2
-git clean -ffxdq || true
+
+echo "running: find . -mindepth 1 -delete"
+find . -mindepth 1 -delete

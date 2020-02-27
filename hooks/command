@@ -9,6 +9,7 @@ IMAGE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_IMAGE
 COMPOSE_FILE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_COMPOSE_FILE
 SERVICE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_SERVICE
 SHOULD_BUILD=$BUILDKITE_PLUGIN_DOCKER_CONTROL_BUILD
+ARTIFACT_DOWNLOAD=$BUILDKITE_PLUGIN_DOCKER_CONTROL_ARTIFACT_DOWNLOAD
 export PACKAGE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_PACKAGE
 
 VERBOSE=""
@@ -41,6 +42,17 @@ CMD
 
 # copy contents of web-code-source to the working directory
 cp -a web-code-source/* .
+
+# download artifact, if specified
+if [ -n "$ARTIFACT_DOWNLOAD" ]; then
+  echo "--- :arrow_heading_down: downloading artifacts ${ARTIFACT_DOWNLOAD}"
+  set +e
+  buildkite-agent artifact download "${ARTIFACT_DOWNLOAD}" .
+  if [ $? -ne 0 ]; then
+    echo "Artifact ${ARTIFACT_DOWNLOAD} not found. Continuing..."
+  fi
+  set -e
+fi
 
 if [ -n "$SHOULD_BUILD" ]; then
   IMAGE=$IMAGE docker-compose $VERBOSE -f $COMPOSE_FILE build $SERVICE

@@ -70,3 +70,16 @@ steps:
         # Required properties
         verbose: true
 ```
+
+### `artifact-download` (optional)
+
+Downloads the specified artifacts prior to running docker.
+
+```
+steps:
+  - command: path/to/script.sh
+    plugins:
+      - 'uber-workflow/docker-control':
+        # Required properties
+        artifact-download: 'artifacts/foo/bar.txt'
+```

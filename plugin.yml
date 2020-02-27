@@ -20,6 +20,8 @@ configuration:
       type: boolean
     logs:
       type: boolean
+    artifact-download:
+      type: string
   required:
     - image
     - package
