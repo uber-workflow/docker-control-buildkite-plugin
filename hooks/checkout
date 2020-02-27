@@ -3,4 +3,4 @@
 set -eo pipefail
 
 echo "~~~ :docker: docker-control checkout override" >&2
-git clean -ffxdq || true
+find . -mindepth 1 -delete
