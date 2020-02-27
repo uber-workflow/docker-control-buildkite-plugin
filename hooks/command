@@ -46,6 +46,7 @@ cp -a web-code-source/* .
 
 # download artifact, if specified
 if [ -n "$ARTIFACT_DOWNLOAD" ]; then
+  echo "--- :arrow_heading_down: downloading artifacts ${ARTIFACT_DOWNLOAD}"
   set +e
   buildkite-agent artifact download "${ARTIFACT_DOWNLOAD}" .
   if [ $? -ne 0 ]; then
@@ -69,5 +70,6 @@ fi
 
 # upload artifact, if specified
 if [ -n "$ARTIFACT_UPLOAD" ]; then
+  echo "--- :arrow_heading_up: uploading artifacts ${ARTIFACT_UPLOAD}"
   buildkite-agent artifact upload "${ARTIFACT_UPLOAD}"
 fi
