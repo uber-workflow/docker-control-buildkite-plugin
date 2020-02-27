@@ -67,9 +67,3 @@ else
   echo "+++ :docker: docker-control run" >&2
   IMAGE=$IMAGE docker-compose $VERBOSE -f $COMPOSE_FILE run --rm $SERVICE bash $SCRIPT
 fi
-
-# upload artifact, if specified
-if [ -n "$ARTIFACT_UPLOAD" ]; then
-  echo "--- :arrow_heading_up: uploading artifacts ${ARTIFACT_UPLOAD}"
-  buildkite-agent artifact upload "${ARTIFACT_UPLOAD}"
-fi

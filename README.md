@@ -83,16 +83,3 @@ steps:
         # Required properties
         artifact-download: 'artifacts/foo/bar.txt'
 ```
-
-### `artifact-upload` (optional)
-
-Uploads the specified artifacts after running docker.
-
-```
-steps:
-  - command: path/to/script.sh
-    plugins:
-      - 'uber-workflow/docker-control':
-        # Required properties
-        artifact-upload: 'artifacts/foo/bar.txt'
-```
