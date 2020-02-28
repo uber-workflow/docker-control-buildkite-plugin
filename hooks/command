@@ -11,17 +11,47 @@ SERVICE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_SERVICE
 SHOULD_BUILD=$BUILDKITE_PLUGIN_DOCKER_CONTROL_BUILD
 ARTIFACT_DOWNLOAD=$BUILDKITE_PLUGIN_DOCKER_CONTROL_ARTIFACT_DOWNLOAD
 export PACKAGE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_PACKAGE
+PULL_RETRIES=3
 
 VERBOSE=""
 if [ "$BUILDKITE_PLUGIN_DOCKER_CONTROL_VERBOSE" == "true" ]; then
   VERBOSE="--verbose"
 fi
 
+# retry <number-of-retries> <command>
+function retry {
+  local retries=$1; shift
+  local attempts=1
+  local status=0
+
+  until "$@"; do
+    status=$?
+    echo "Exited with $status"
+    if (( retries == "0" )); then
+      return $status
+    elif (( attempts == retries )); then
+      echo "Failed $attempts retries"
+      return $status
+    else
+      echo "Retrying $((retries - attempts)) more times..."
+      attempts=$((attempts + 1))
+      sleep $(((attempts - 2) * 2))
+    fi
+  done
+}
+
 echo "Running ${CMD} for ${PACKAGE} in ${IMAGE}"
 
 mkdir -p web-code-source && chmod a+w web-code-source
 
 # pull out ci code and $PACKAGE code from the docker build image, and store in local /web-code-source folder
+echo "Pulling image: $IMAGE"
+if retry "$PULL_RETRIES" docker pull "$IMAGE" ; then
+  echo "Docker image pull succeeded."
+else
+  echo "!!! :docker: Pull docker image failed: $IMAGE"
+fi
+
 docker run \
   -v ${PWD}/web-code-source:/web-code-source \
   -i \
