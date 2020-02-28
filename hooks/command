@@ -73,11 +73,13 @@ CMD
 # copy contents of web-code-source to the working directory
 cp -a web-code-source/* .
 
-# Update artifact folders for web-code.
-chmod -R 777 "artifacts" || true
-chmod -R 777 "${PACKAGE}/artifacts" || true
-rm "artifacts/.gitignore" || true
-rm "${PACKAGE}/artifacts/.gitignore" || true
+if [ "$BUILDKITE_PIPELINE_NAME" = "web-code-runner" ]; then
+  # Update artifact folders for web-code.
+  chmod -R 777 "artifacts" || true
+  chmod -R 777 "${PACKAGE}/artifacts" || true
+  rm "artifacts/.gitignore" || true
+  rm "${PACKAGE}/artifacts/.gitignore" || true
+fi
 
 # download artifact, if specified
 if [ -n "$ARTIFACT_DOWNLOAD" ]; then
