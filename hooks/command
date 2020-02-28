@@ -43,8 +43,11 @@ CMD
 # copy contents of web-code-source to the working directory
 cp -a web-code-source/* .
 
+# Update artifact folders for web-code.
 chmod -R 777 "artifacts" || true
 chmod -R 777 "${PACKAGE}/artifacts" || true
+rm "artifacts/.gitignore" || true
+rm "${PACKAGE}/artifacts/.gitignore" || true
 
 # download artifact, if specified
 if [ -n "$ARTIFACT_DOWNLOAD" ]; then
