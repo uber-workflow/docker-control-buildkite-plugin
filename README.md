@@ -83,3 +83,17 @@ steps:
         # Required properties
         artifact-download: 'artifacts/foo/bar.txt'
 ```
+
+
+### `kill-before-run` (optional)
+
+Kills all running docker containers if true.
+
+```
+steps:
+  - command: path/to/script.sh
+    plugins:
+      - 'uber-workflow/docker-control':
+        # Required properties
+        kill-before-run: true
+```
