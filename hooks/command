@@ -9,7 +9,6 @@ IMAGE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_IMAGE
 COMPOSE_FILE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_COMPOSE_FILE
 SERVICE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_SERVICE
 SHOULD_BUILD=$BUILDKITE_PLUGIN_DOCKER_CONTROL_BUILD
-KILL_BEORE_RUN=$BUILDKITE_PLUGIN_DOCKER_CONTROL_KILL_BEFORE_RUN
 ARTIFACT_DOWNLOAD=$BUILDKITE_PLUGIN_DOCKER_CONTROL_ARTIFACT_DOWNLOAD
 export PACKAGE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_PACKAGE
 PULL_RETRIES=3
@@ -46,9 +45,7 @@ echo "Running ${CMD} for ${PACKAGE} in ${IMAGE}"
 mkdir -p web-code-source && chmod a+w web-code-source
 
 # Try killing all docker-compose containers to ensure there's no conflicting running containers.
-if [ -n "$KILL_BEORE_RUN" ]; then
-  docker kill $(docker ps -q) || true
-fi
+docker kill $(docker ps -q) || true
 
 # pull out ci code and $PACKAGE code from the docker build image, and store in local /web-code-source folder
 echo "Pulling image: $IMAGE"
