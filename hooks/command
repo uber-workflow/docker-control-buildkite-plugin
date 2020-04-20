@@ -84,11 +84,16 @@ if [ "$BUILDKITE_PIPELINE_NAME" = "web-code-runner" ] || [ "$BUILDKITE_PIPELINE_
   rm "${PACKAGE}/artifacts/.gitignore" || true
 fi
 
+if [ "$BUILDKITE_PIPELINE_NAME" = "web-code-task-runner" ]; then
+  chmod 777 "artifacts" || true
+fi
+
 # download artifact, if specified
 if [ -n "$ARTIFACT_DOWNLOAD" ]; then
   echo "--- :arrow_heading_down: downloading artifacts ${ARTIFACT_DOWNLOAD}"
   set +e
   buildkite-agent artifact download "${ARTIFACT_DOWNLOAD}" .
+  chmod -R 777 $(dirname "${ARTIFACT_DOWNLOAD}")
   if [ $? -ne 0 ]; then
     echo "Artifact ${ARTIFACT_DOWNLOAD} not found. Continuing..."
   fi
