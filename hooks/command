@@ -16,6 +16,10 @@ mkdir -p artifacts/analysis
 mv $BUILDKITE_JOB_ID.log artifacts/analysis/log
 echo "$exit_code" > artifacts/analysis/exit_code
 
+ls -al artifacts/analysis
+
+buildkite-agent artifact upload "artifacts/analysis/**"
+
 # 2) do analysis
 # input: artifacts/analysis folder
 # output: { category, subCategory, shouldRetry }
