@@ -4,5 +4,5 @@ set -eo pipefail
 
 readonly dir="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
-# capture analysis data
+# capture logs for analysis in the post-command step
 . "$dir/command-body.sh" 2>&1 | tee $BUILDKITE_JOB_ID.log

@@ -1,3 +1,7 @@
+#!/bin/bash
+
+set -eo pipefail
+
 echo "~~~ post-command test"
 
 echo "BUILDKITE_TRIGGERED_FROM_BUILD_ID $BUILDKITE_TRIGGERED_FROM_BUILD_ID"
@@ -13,7 +17,7 @@ echo "BUILDKITE_COMMAND_EXIT_STATUS $BUILDKITE_COMMAND_EXIT_STATUS"
 set +e # never fail the job because of analysis
 readonly analysis_dir="artifacts/analysis"
 mkdir -p "$analysis_dir"
-mv $BUILDKITE_JOB_ID.log "$analysis_dir/log"
+mv "${BUILDKITE_JOB_ID}.log" "$analysis_dir/log"
 echo "$BUILDKITE_COMMAND_EXIT_STATUS" > "$analysis_dir/exit_code"
 
 ls -al "$analysis_dir"
@@ -26,6 +30,6 @@ buildkite-agent artifact upload "$analysis_dir/**"
 if [ -x tools/analyzers/run.py ]; then
   result=$(python tools/analyzers/run.py --pipeline "$BUILDKITE_PIPELINE_SLUG" --jobKey "$BUILDKITE_STEP_KEY" --analysisDir "$analysis_dir")
 fi
-cat $result | buildkite-agent meta-data set "JOB_ANALYSIS-$BUILDKITE_JOB_ID"
+cat "$result" | buildkite-agent meta-data set "JOB_ANALYSIS-$BUILDKITE_JOB_ID"
 
 set -e
