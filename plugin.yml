@@ -22,8 +22,6 @@ configuration:
       type: boolean
     artifact-download:
       type: string
-    log-file:
-      type: string
   required:
     - image
     - package
