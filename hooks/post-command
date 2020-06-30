@@ -18,21 +18,15 @@ mv $BUILDKITE_JOB_ID.log artifacts/analysis/log
 echo "$BUILDKITE_COMMAND_EXIT_STATUS" > artifacts/analysis/exit_code
 
 ls -al artifacts/analysis
-
 buildkite-agent artifact upload "artifacts/analysis/**"
 
-# 2) do analysis
-# input: pipelineSlug/jobKey/analysis folder
-# e.g.: web-code-runner/lint/analysisFolder
-# output: { category, subCategory }
-python --version
-
-# TODO: 
-# python tools/ci/analyze/run.py \
-# --pipeline <FOO> \
-# --jobKey <BAR> \
-# --artifacts <DIR where inputs live>
-# 
-# outputs: { category, subCategory }
+# 2) do job analysis
+# input: { pipelineSlug, jobKey, analysis } folder
+# e.g.: { web-code-runner, lint, analysisFolder }
+# output: { category, subCategory }, e.g.: { "category": "InfraFailure", "subCategory": "generic" }
+if [ -x tools/analyzers/run.py ]; then
+  result=$(python tools/analyzers/run.py --pipeline "$BUILDKITE_PIPELINE_SLUG" --jobKey "$BUILDKITE_STEP_KEY" --artifacts "artifacts/analysis")
+fi
+cat $result | buildkite-agent meta-data set "JOB_ANALYSIS-$BUILDKITE_JOB_ID"
 
 set -e
