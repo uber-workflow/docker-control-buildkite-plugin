@@ -5,7 +5,7 @@ set -eo pipefail
 readonly dir="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
 # capture analysis data
-. "$dir/command-body.sh" | tee $BUILDKITE_JOB_ID.log
+. "$dir/command-body.sh" 2>&1 | tee $BUILDKITE_JOB_ID.log
 exit_code="${PIPESTATUS[0]}"
 
 # DO ANALYSIS (or do it in post-command hook)
