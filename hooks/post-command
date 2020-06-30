@@ -22,15 +22,17 @@ ls -al artifacts/analysis
 buildkite-agent artifact upload "artifacts/analysis/**"
 
 # 2) do analysis
-# input: artifacts/analysis folder
-# output: { category, subCategory, shouldRetry }
+# input: pipelineSlug/jobKey/analysis folder
+# e.g.: web-code-runner/lint/analysisFolder
+# output: { category, subCategory }
+python --version
 
-# maybe: clean up artifacts/analysis folder when done analyzing
-
-# re-map exit code if shouldRetry is true here! (use a special exit code to signify retry to Buildkite)
-
-# TRY: re-map BUILDKITE_COMMAND_EXIT_STATUS
-export BUILDKITE_COMMAND_EXIT_STATUS=999
-echo $BUILDKITE_COMMAND_EXIT_STATUS
+# TODO: 
+# python tools/ci/analyze/run.py \
+# --pipeline <FOO> \
+# --jobKey <BAR> \
+# --artifacts <DIR where inputs live>
+# 
+# outputs: { category, subCategory }
 
 set -e
