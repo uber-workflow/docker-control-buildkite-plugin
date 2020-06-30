@@ -15,7 +15,7 @@ echo "BUILDKITE_COMMAND_EXIT_STATUS $BUILDKITE_COMMAND_EXIT_STATUS"
 set +e # never fail the job because of analysis
 mkdir -p artifacts/analysis
 mv $BUILDKITE_JOB_ID.log artifacts/analysis/log
-echo "$exit_code" > artifacts/analysis/exit_code
+echo "$BUILDKITE_COMMAND_EXIT_STATUS" > artifacts/analysis/exit_code
 
 ls -al artifacts/analysis
 
@@ -30,7 +30,7 @@ buildkite-agent artifact upload "artifacts/analysis/**"
 # re-map exit code if shouldRetry is true here! (use a special exit code to signify retry to Buildkite)
 
 # TRY: re-map BUILDKITE_COMMAND_EXIT_STATUS
-export BUILDKITE_COMMAND_EXIT_STATUS=-999
+export BUILDKITE_COMMAND_EXIT_STATUS=999
 echo $BUILDKITE_COMMAND_EXIT_STATUS
 
 set -e
