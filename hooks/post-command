@@ -9,8 +9,6 @@ echo "BUILDKITE_LABEL $BUILDKITE_LABEL"
 echo "BUILDKITE_COMMAND $BUILDKITE_COMMAND"
 echo "BUILDKITE_COMMAND_EXIT_STATUS $BUILDKITE_COMMAND_EXIT_STATUS"
 
-# DO ANALYSIS (or do it in post-command hook)
-# TODO: hide behind an optional ANALYZE_JOB=true/false flag (default to false?)
 # 1) create the analysis folder & artifacts
 set +e # never fail the job because of analysis
 readonly analysis_dir="artifacts/analysis"
