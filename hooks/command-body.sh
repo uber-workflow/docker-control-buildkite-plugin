@@ -1,0 +1,114 @@
+#!/bin/bash
+
+set -eo pipefail
+
+echo "~~~ :docker: docker-control setup" >&2
+
+SCRIPT=$BUILDKITE_COMMAND
+IMAGE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_IMAGE
+COMPOSE_FILE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_COMPOSE_FILE
+SERVICE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_SERVICE
+SHOULD_BUILD=$BUILDKITE_PLUGIN_DOCKER_CONTROL_BUILD
+ARTIFACT_DOWNLOAD=$BUILDKITE_PLUGIN_DOCKER_CONTROL_ARTIFACT_DOWNLOAD
+export PACKAGE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_PACKAGE
+PULL_RETRIES=3
+
+VERBOSE=""
+if [ "$BUILDKITE_PLUGIN_DOCKER_CONTROL_VERBOSE" == "true" ]; then
+  VERBOSE="--verbose"
+fi
+
+# retry <number-of-retries> <command>
+function retry {
+  local retries=$1; shift
+  local attempts=1
+  local status=0
+
+  until "$@"; do
+    status=$?
+    echo "Exited with $status"
+    if (( retries == "0" )); then
+      return $status
+    elif (( attempts == retries )); then
+      echo "Failed $attempts retries"
+      return $status
+    else
+      echo "Retrying $((retries - attempts)) more times..."
+      attempts=$((attempts + 1))
+      sleep $(((attempts - 2) * 2))
+    fi
+  done
+}
+
+echo "Running ${CMD} for ${PACKAGE} in ${IMAGE}"
+
+mkdir -p web-code-source && chmod a+w web-code-source
+
+# Try killing all docker-compose containers to ensure there's no conflicting running containers.
+docker kill $(docker ps -q) || true
+
+# pull out ci code and $PACKAGE code from the docker build image, and store in local /web-code-source folder
+echo "Pulling image: $IMAGE"
+if retry "$PULL_RETRIES" docker pull "$IMAGE" ; then
+  echo "Docker image pull succeeded."
+else
+  echo "!!! :docker: Pull docker image failed: $IMAGE"
+fi
+
+docker run \
+  -v ${PWD}/web-code-source:/web-code-source \
+  -i \
+  --rm \
+  -u 0 \
+  $IMAGE bash <<CMD
+rm -rf /web-code-source/*
+cp -rf /web-code/ci /web-code-source
+mkdir -p /web-code-source/$(dirname $PACKAGE)
+mkdir -p /web-code-source/tools
+cp -rf /web-code/tools/ci /web-code-source/tools
+cp -rf /web-code/$PACKAGE /web-code-source/$PACKAGE
+cp -rf /web-code/artifacts /web-code-source/artifacts
+echo Changing owner of /web-code-source from \$(id -u):\$(id -g) to $(id -u):$(id -g)
+chown -R $(id -u):$(id -g) /web-code-source
+echo "chown DONE"
+CMD
+
+# copy contents of web-code-source to the working directory
+cp -a web-code-source/* .
+
+if [ "$BUILDKITE_PIPELINE_NAME" = "web-code-runner" ] || [ "$BUILDKITE_PIPELINE_NAME" = "web-code" ]; then
+  # Update artifact folders for web-code.
+  chmod -R 777 "artifacts" || true
+  chmod -R 777 "${PACKAGE}/artifacts" || true
+  rm "artifacts/.gitignore" || true
+  rm "${PACKAGE}/artifacts/.gitignore" || true
+fi
+
+if [ "$BUILDKITE_PIPELINE_NAME" = "web-code-task-runner" ]; then
+  chmod 777 "artifacts" || true
+fi
+
+# download artifact, if specified
+if [ -n "$ARTIFACT_DOWNLOAD" ]; then
+  echo "--- :arrow_heading_down: downloading artifacts ${ARTIFACT_DOWNLOAD}"
+  set +e
+  buildkite-agent artifact download "${ARTIFACT_DOWNLOAD}" .
+  chmod -R 777 $(dirname "${ARTIFACT_DOWNLOAD}")
+  if [ $? -ne 0 ]; then
+    echo "Artifact ${ARTIFACT_DOWNLOAD} not found. Continuing..."
+  fi
+  set -e
+fi
+
+if [ -n "$SHOULD_BUILD" ]; then
+  COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 IMAGE=$IMAGE docker-compose $VERBOSE -f $COMPOSE_FILE build --progress=plain $SERVICE
+fi
+
+if [ -z $SCRIPT ]
+then
+  echo "+++ :docker: docker-control run" >&2
+  IMAGE=$IMAGE docker-compose $VERBOSE -f $COMPOSE_FILE run --rm $SERVICE
+else
+  echo "+++ :docker: docker-control run" >&2
+  IMAGE=$IMAGE docker-compose $VERBOSE -f $COMPOSE_FILE run --rm $SERVICE bash $SCRIPT
+fi
