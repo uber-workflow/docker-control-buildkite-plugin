@@ -13,19 +13,20 @@ echo "BUILDKITE_COMMAND_EXIT_STATUS $BUILDKITE_COMMAND_EXIT_STATUS"
 # TODO: hide behind an optional ANALYZE_JOB=true/false flag (default to false?)
 # 1) create the analysis folder & artifacts
 set +e # never fail the job because of analysis
-mkdir -p artifacts/analysis
-mv $BUILDKITE_JOB_ID.log artifacts/analysis/log
-echo "$BUILDKITE_COMMAND_EXIT_STATUS" > artifacts/analysis/exit_code
+readonly analysis_dir="artifacts/analysis"
+mkdir -p "$analysis_dir"
+mv $BUILDKITE_JOB_ID.log "$analysis_dir/log"
+echo "$BUILDKITE_COMMAND_EXIT_STATUS" > "$analysis_dir/exit_code"
 
-ls -al artifacts/analysis
-buildkite-agent artifact upload "artifacts/analysis/**"
+ls -al "$analysis_dir"
+buildkite-agent artifact upload "$analysis_dir/**"
 
 # 2) do job analysis
 # input: { pipelineSlug, jobKey, analysis } folder
-# e.g.: { web-code-runner, lint, analysisFolder }
+# e.g.: { web-code-runner, lint, analysisDir }
 # output: { category, subCategory }, e.g.: { "category": "InfraFailure", "subCategory": "generic" }
 if [ -x tools/analyzers/run.py ]; then
-  result=$(python tools/analyzers/run.py --pipeline "$BUILDKITE_PIPELINE_SLUG" --jobKey "$BUILDKITE_STEP_KEY" --artifacts "artifacts/analysis")
+  result=$(python tools/analyzers/run.py --pipeline "$BUILDKITE_PIPELINE_SLUG" --jobKey "$BUILDKITE_STEP_KEY" --analysisDir "$analysis_dir")
 fi
 cat $result | buildkite-agent meta-data set "JOB_ANALYSIS-$BUILDKITE_JOB_ID"
 
