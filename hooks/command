@@ -76,7 +76,7 @@ CMD
 # copy contents of web-code-source to the working directory
 cp -a web-code-source/* .
 
-if [ "$BUILDKITE_PIPELINE_NAME" = "web-code-runner" ] || [ "$BUILDKITE_PIPELINE_NAME" = "web-code" ]; then
+if [ ! "$BUILDKITE_PIPELINE_NAME" = "web-code-task-runner" ]; then
   # Update artifact folders for web-code.
   chmod -R 777 "artifacts" || true
   chmod -R 777 "${PACKAGE}/artifacts" || true
