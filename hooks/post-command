@@ -10,4 +10,4 @@ fi
 echo "~~~ :arrow_double_up: uploading failure analysis to s3"
 
 BUILD_ID="${BUILDKITE_TRIGGERED_FROM_BUILD_ID:-BUILDKITE_BUILD_ID}"
-aws s3 cp "$failure" "s3://uber-web-monorepo/analysis/${BUILD_ID}/${BUILDKITE_JOB_ID}/failure"
+aws s3 cp "$failure" "s3://uber-web-monorepo/analysis/build-${BUILD_ID}/job-${BUILDKITE_JOB_ID}/failure"
