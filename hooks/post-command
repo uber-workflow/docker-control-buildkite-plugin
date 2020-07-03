@@ -1,0 +1,13 @@
+#!/bin/bash
+
+failure="artifacts/analysis/failure"
+
+# if failure file not present, exit
+if ! ls failure &> /dev/null; then
+  exit 0
+fi
+
+echo "~~~ :arrow_double_up: uploading failure analysis to s3"
+
+BUILD_ID="${BUILDKITE_TRIGGERED_FROM_BUILD_ID:-BUILDKITE_BUILD_ID}"
+aws s3 cp failure "s3://uber-web-monorepo/analysis/${BUILD_ID}/${BUILDKITE_JOB_ID}/failure"
