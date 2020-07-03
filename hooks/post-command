@@ -11,4 +11,4 @@ echo "~~~ :arrow_double_up: uploading failure analysis to s3"
 
 PIPELINE_SLUG="${BUILDKITE_TRIGGERED_FROM_BUILD_PIPELINE_SLUG:-BUILDKITE_PIPELINE_SLUG}"
 BUILD_ID="${BUILDKITE_TRIGGERED_FROM_BUILD_ID:-BUILDKITE_BUILD_ID}"
-aws s3 cp "$failure" "s3://uber-web-monorepo/analysis/${PIPELINE_SLUG}/build-${BUILD_ID}/job-${BUILDKITE_JOB_ID}/failure"
+aws s3 cp "$failure" "s3://uber-web-monorepo/analysis/${PIPELINE_SLUG}/build-${BUILD_ID}/${BUILDKITE_JOB_ID}.failure"
