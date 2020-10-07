@@ -14,6 +14,6 @@ fi
 # Try to spin down services
 echo "~~~ :docker: docker-control cleanup" >&2
 docker-compose -f $COMPOSE_FILE kill || true
-docker-compose -f $COMPOSE_FILE down || true
+docker-compose -f $COMPOSE_FILE down -v || true
 echo "Removing image ${IMAGE}"
 docker image rm "$IMAGE" || true
