@@ -17,3 +17,6 @@ docker-compose -f $COMPOSE_FILE kill || true
 docker-compose -f $COMPOSE_FILE down -v || true
 echo "Removing image ${IMAGE}"
 docker image rm "$IMAGE" || true
+
+# Log out docker disk usage
+docker system df
