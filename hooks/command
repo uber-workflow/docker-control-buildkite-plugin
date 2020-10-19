@@ -101,7 +101,12 @@ if [ -n "$ARTIFACT_DOWNLOAD" ]; then
 fi
 
 if [ -n "$SHOULD_BUILD" ]; then
+  set +e
   COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 IMAGE=$IMAGE docker-compose $VERBOSE -f $COMPOSE_FILE build --progress=plain $SERVICE
+  if [ $? = 255 ]; then
+    exit 1
+  fi
+  set -e
 fi
 
 if [ -z $SCRIPT ]
