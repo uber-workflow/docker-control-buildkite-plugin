@@ -46,6 +46,7 @@ mkdir -p web-code-source && chmod a+w web-code-source
 
 # Try killing all docker-compose containers to ensure there's no conflicting running containers.
 docker kill $(docker ps -q) || true
+docker volume rm $(docker volume ls -q) > /dev/null 2>&1 || true
 
 # pull out ci code and $PACKAGE code from the docker build image, and store in local /web-code-source folder
 echo "Pulling image: $IMAGE"
