@@ -9,18 +9,22 @@ trap '' SIGTERM
 COMPOSE_FILE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_COMPOSE_FILE
 IMAGE=$BUILDKITE_PLUGIN_DOCKER_CONTROL_IMAGE
 
-if [ "$BUILDKITE_PLUGIN_DOCKER_CONTROL_LOGS" == "true" ]; then
-echo "~~~ :docker: docker-control service logs" >&2
-  docker-compose -f $COMPOSE_FILE logs --tail="all" > docker-compose-logs.txt
-  buildkite-agent artifact upload docker-compose-logs.txt
-fi
+if [ -e "$COMPOSE_FILE" ]; then
+  if [ "$BUILDKITE_PLUGIN_DOCKER_CONTROL_LOGS" == "true" ]; then
+  echo "~~~ :docker: docker-control service logs" >&2
+    docker-compose -f $COMPOSE_FILE logs --tail="all" > docker-compose-logs.txt
+    buildkite-agent artifact upload docker-compose-logs.txt
+  fi
 
-# Try to spin down services
-echo "~~~ :docker: docker-control cleanup" >&2
-docker-compose -f $COMPOSE_FILE kill || true
-docker-compose -f $COMPOSE_FILE down -v || true
-echo "Removing image ${IMAGE}"
-docker image rm "$IMAGE" || true
+  # Try to spin down services
+  echo "~~~ :docker: docker-control cleanup" >&2
+  docker-compose -f $COMPOSE_FILE kill || true
+  docker-compose -f $COMPOSE_FILE down -v || true
+  echo "Removing image ${IMAGE}"
+  docker image rm "$IMAGE" || true
+else
+  echo "${COMPOSE_FILE} not found; skipping cleanup"
+fi
 
 # Log out docker disk usage
 docker system df
